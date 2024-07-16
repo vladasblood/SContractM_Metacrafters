@@ -6,7 +6,7 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 const { ethers } = hre;
-
+//try
 async function main() {
   const initBalance = ethers.utils.parseEther("1.0"); // Initial balance in ether
   const interestRate = 1000; // Example interest rate: 100%
