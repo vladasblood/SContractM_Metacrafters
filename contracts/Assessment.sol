@@ -3,105 +3,78 @@ pragma solidity ^0.8.9;
 
 contract Assessment {
     address payable public owner;
-    uint256 public balance;
-    uint256 public interestRate; // Interest rate in percentage (e.g., 5 for 5%)
-    uint256 public lastInterestCalculation;
-    uint256 public interestInterval; // Interval for interest calculation (in seconds)
+    mapping(address => uint256) public oilBalances;
 
     struct Transaction {
-        uint256 timestamp;
         address from;
         address to;
         uint256 amount;
+        string action;
+        uint256 timestamp;
     }
-    
-    Transaction[] public transactionHistory;
 
-    event Deposit(address indexed account, uint256 amount);
-    event Withdraw(address indexed account, uint256 amount);
-    event InterestAccrued(uint256 amount);
-    event TransactionRecorded(uint256 indexed index, uint256 timestamp, address indexed from, address indexed to, uint256 amount);
+    Transaction[] public transactions;
 
-    constructor(uint256 initBalance, uint256 _interestRate, uint256 _interestInterval) payable {
+    event ExtractOil(address indexed from, uint256 amount);
+    event SellOil(address indexed to, uint256 amount);
+    event TransferOil(address indexed from, address indexed to, uint256 amount);
+
+    constructor(uint256 initialOil) payable {
         owner = payable(msg.sender);
-        balance = initBalance;
-        interestRate = _interestRate;
-        interestInterval = _interestInterval;
-        lastInterestCalculation = block.timestamp;
+        oilBalances[msg.sender] = initialOil;
     }
 
-    function getBalance() public view returns (uint256) {
-        return balance;
+    function getOilBalances(address _account) public view returns (uint256) {
+        return oilBalances[_account];
     }
 
-    function deposit(uint256 _amount) public payable {
-        require(msg.sender == owner, "You are not the owner of this account");
-
-        uint256 _previousBalance = balance;
-        balance += _amount;
-
-        emit Deposit(msg.sender, _amount);
-        recordTransaction(address(0), msg.sender, _amount);
-
-        assert(balance == _previousBalance + _amount);
+    function extractOil(uint256 _amount) public payable {
+        oilBalances[msg.sender] += _amount;
+        transactions.push(Transaction({
+            from: msg.sender,
+            to: address(0),
+            amount: _amount,
+            action: "Extract",
+            timestamp: block.timestamp
+        }));
+        emit ExtractOil(msg.sender, _amount);
     }
 
-    error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
+    function sellOil(uint256 _amount) public {
+        require(oilBalances[msg.sender] >= _amount, "Insufficient balance");
 
-    function withdraw(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner of this account");
+        oilBalances[msg.sender] -= _amount;
+        payable(msg.sender).transfer(_amount);
 
-        uint256 _previousBalance = balance;
-        if (balance < _withdrawAmount) {
-            revert InsufficientBalance({
-                balance: balance,
-                withdrawAmount: _withdrawAmount
-            });
-        }
+        transactions.push(Transaction({
+            from: msg.sender,
+            to: address(0),
+            amount: _amount,
+            action: "Sell",
+            timestamp: block.timestamp
+        }));
 
-        balance -= _withdrawAmount;
-
-        emit Withdraw(msg.sender, _withdrawAmount);
-        recordTransaction(msg.sender, address(0), _withdrawAmount);
-
-        assert(balance == (_previousBalance - _withdrawAmount));
+        emit SellOil(msg.sender, _amount);
     }
 
-    function calculateInterest() internal {
-        uint256 timePassed = block.timestamp - lastInterestCalculation;
-        uint256 interest = (balance * interestRate * timePassed) / (interestInterval * 100);
-        balance += interest;
-        lastInterestCalculation = block.timestamp;
+    function transferOil(address _to, uint256 _amount) public {
+        require(oilBalances[msg.sender] >= _amount, "Insufficient balance");
 
-        emit InterestAccrued(interest);
+        oilBalances[msg.sender] -= _amount;
+        oilBalances[_to] += _amount;
+
+        transactions.push(Transaction({
+            from: msg.sender,
+            to: _to,
+            amount: _amount,
+            action: "Transfer",
+            timestamp: block.timestamp
+        }));
+
+        emit TransferOil(msg.sender, _to, _amount);
     }
 
-    // Modifier to trigger interest calculation before executing a function
-    modifier accrueInterestIfNeeded {
-        uint256 timePassed = block.timestamp - lastInterestCalculation;
-        if (timePassed >= interestInterval) {
-            calculateInterest();
-        }
-        _;
-    }
-
-    function accrueInterest() public accrueInterestIfNeeded {
-        require(msg.sender == owner, "You are not the owner of this account");
-    }
-
-    function recordTransaction(address _from, address _to, uint256 _amount) internal {
-        Transaction memory newTransaction = Transaction(block.timestamp, _from, _to, _amount);
-        transactionHistory.push(newTransaction);
-        emit TransactionRecorded(transactionHistory.length - 1, block.timestamp, _from, _to, _amount);
-    }
-
-    function getTransactionHistoryLength() public view returns (uint256) {
-        return transactionHistory.length;
-    }
-
-    function getTransaction(uint256 index) public view returns (uint256, address, address, uint256) {
-        require(index < transactionHistory.length, "Index out of bounds");
-        Transaction memory txn = transactionHistory[index];
-        return (txn.timestamp, txn.from, txn.to, txn.amount);
+    function getTransactions() public view returns (Transaction[] memory) {
+        return transactions;
     }
 }

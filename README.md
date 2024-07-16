@@ -1,10 +1,10 @@
-# Simple Smart Contract Management - Metacrafters
+# Titan Oil Corporation - SCM Metacrafters
 
-The program is set to clone the current starter template of the SCM project, then with additional 2 functions. In this case, since the concept of the smart contract is ATM so it will include interest rates and real-time transaction history. The purpose of the project was to demonstrate on how to connect a React frontend with your smart contract management system.
+This Solidity smart contract is designed as an oil management system, allowing users to extract, sell, and transfer oil while maintaining real-time transaction records. The contract includes essential functions for managing oil balances and tracking transactions through a series of events and a transaction log. Users can extract oil to increase their balance, sell oil for Ether, and transfer oil to other addresses, with each action being recorded with a timestamp. Additionally, the contract features a mechanism for emitting events to signal these actions and provides a function to retrieve the entire transaction history. The aim of this project is to showcase how to integrate a smart contract with a React frontend for a comprehensive oil management and tracking system.
 
 ## Description
 
-The program is a simple smart contract management that revolves around the concept of ATM. It can return values that are dictated for accrued interest rates and transaction records. Basically, ATM smart contract management brings vast improvements in security, automated executions, and compliance with regulations. Through blockchain, smart contracts are hardwired with security strictures, making sure that just authenticated transactions are processed and user identity is confirmed. Automation of transaction processes streamlines operations, reducing the likelihood of potential errors and enhancing speed in transactions. The further step could be programming smart contracts to enforce regulatory standards by themselves, hence making it easier to track the adherence to laws like KYC and AML. Altogether, the integration of smart contract management in the operation of ATMs enhances the efficiency and security of regulatory compliance.
+The program is a streamlined smart contract system designed to manage oil transactions in a manner akin to an ATM. It facilitates operations such as extracting, selling, and transferring oil while providing real-time updates on transaction history. This smart contract enhances security by ensuring that only authorized transactions are executed and user identities are validated through blockchain technology. The automation of these processes not only boosts operational efficiency but also minimizes the potential for errors, speeding up transactions. Furthermore, the smart contract can be programmed to adhere to regulatory standards, simplifying the enforcement of compliance measures like KYC and AML. By integrating this smart contract system, the management of oil transactions is optimized for both security and efficiency, aligning with best practices in regulatory adherence.
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ The program is a simple smart contract management that revolves around the conce
 To run this program, you must install necessary libraries and components. One may use Gitpod. However, in my case, I used my local installed visual studio code that has been installed with packages that are needed.
 
 1. Clone this public repository.
-2. Inside the project directory, in the terminal type: `npm i`
+2. Inside the project directory where the `package.json` is located, in the terminal type: `npm i`
 3. Open two additional terminals in your VS code
 4. In the second terminal type: `npx hardhat node`
 5. In the third terminal, type: `npx hardhat run --network localhost scripts/deploy.js`
@@ -41,15 +41,16 @@ Last thing you need is to set up your metamask account so that you can interact 
 
 ### Executing program
 
-Once you are ready to execute the program, refresh the website.
+To execute the program, begin by refreshing the website. You will then see elements such as the header, your account address, and your current oil balance. Make sure to connect your MetaMask wallet to the system to facilitate transactions between your wallet and the smart contract. 
 
-Inside the website, you will text views such as header, your account address, and your balance in the system. But before that, you must connect your metamask to the system so that it has guaranteed transactions vice-versa with the respective account that you will use.
+When you use the `extract` button, MetaMask will prompt you to confirm the transfer of oil into the system, and your updated balance will be reflected immediately. 
 
-When using the `deposit` button, the metamask will prompt a confirmation that you want to transfer your ETH to the system balance of the ATM, from which it will instantly reflect on how much you have transferred.
+Similarly, clicking the `sell` button will prompt MetaMask to confirm the withdrawal of oil from the system and transfer the equivalent Ether to your wallet. 
 
-Same with the `withdraw` button, the metamask will prompt a confirmation that you want to withdraw your ATM balance back to your wallet.
+For transferring oil to another account, use the `transfer` button, which will prompt MetaMask to confirm the oil transfer between accounts. 
 
-You can observe that a real-time transaction history is always refresh when a transaction has been successful. It will include details such as `timestamp`, `from`, `to` and `amount`.
+Each of these actions will trigger an update to the real-time transaction history, which will display details such as `timestamp`, `from`, `to`, and `amount` following a successful transaction.
+
 
 ## Help
 
